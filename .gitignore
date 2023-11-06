@@ -25,4 +25,3 @@ Dockerfile.cross
 *.swo
 *~
 githubtoken.env
-.goreleaser.yaml
