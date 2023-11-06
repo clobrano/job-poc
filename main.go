@@ -94,6 +94,7 @@ func main() {
 
 	if err = (&controllers.JobPocRemediationReconciler{
 		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("poc"),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "JobPocRemediation")
