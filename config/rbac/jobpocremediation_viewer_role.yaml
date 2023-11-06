@@ -1,0 +1,27 @@
+# permissions for end users to view jobpocremediations.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: jobpocremediation-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: job-poc
+    app.kubernetes.io/part-of: job-poc
+    app.kubernetes.io/managed-by: kustomize
+  name: jobpocremediation-viewer-role
+rules:
+- apiGroups:
+  - job-poc-remediation.medik8s.io
+  resources:
+  - jobpocremediations
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - job-poc-remediation.medik8s.io
+  resources:
+  - jobpocremediations/status
+  verbs:
+  - get

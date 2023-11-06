@@ -1,0 +1,12 @@
+apiVersion: job-poc-remediation.medik8s.io/v1alpha1
+kind: JobPocRemediation
+metadata:
+  labels:
+    app.kubernetes.io/name: jobpocremediation
+    app.kubernetes.io/instance: jobpocremediation-sample
+    app.kubernetes.io/part-of: job-poc
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: job-poc
+  name: jobpocremediation-sample
+spec:
+  # TODO(user): Add fields here
