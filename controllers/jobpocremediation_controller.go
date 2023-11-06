@@ -22,9 +22,9 @@ import (
 	"time"
 
 	jobpocremediationv1alpha1 "github.com/clobrano/job-poc/api/v1alpha1"
+	utils "github.com/clobrano/job-poc/pkg"
 	"github.com/go-logr/logr"
 	batchv1 "k8s.io/api/batch/v1"
-	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -72,7 +72,6 @@ func (r *JobPocRemediationReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		Namespace: cr.Namespace,
 	}
 	var job batchv1.Job
-	backoffLimit := int32(1)
 	if err := r.Get(ctx, key, &job); err != nil {
 		if !apierrors.IsNotFound(err) {
 			l.Error(err, "unable to fetch Job")
@@ -80,64 +79,43 @@ func (r *JobPocRemediationReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		}
 
 		// Job does not exist, create a new one
-		// TODO: consider setting the CR as owner of the Job
-		job = batchv1.Job{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      cr.Name,
-				Namespace: cr.Namespace,
-			},
-			Spec: batchv1.JobSpec{
-				BackoffLimit: &backoffLimit,
-				Template: corev1.PodTemplateSpec{
-					Spec: corev1.PodSpec{
-						Containers: []corev1.Container{
-							{
-								Name:    "job-poc-remediation",
-								Image:   cr.Spec.Image,
-								Command: cr.Spec.Command,
-							},
-						},
-						RestartPolicy: corev1.RestartPolicyNever,
-					},
-				},
-			},
-		}
+		job = utils.NewJob(cr.Name, cr.Namespace, cr.Spec.Image, cr.Spec.Command)
 		if err := r.Create(ctx, &job); err != nil {
 			l.Error(err, "Unable to create Job")
 			return ctrl.Result{}, nil
 		}
 		l.Info("Job created")
 		return ctrl.Result{RequeueAfter: 3 * time.Second}, nil
-	} else {
-		l.Info("Job exists, check status", "Active", job.Status.Active, "Succeeded", job.Status.Succeeded, "Failed", job.Status.Failed, "Backofflimit", job.Spec.BackoffLimit)
-
-		if job.Status.Active == 0 && job.Status.Succeeded == 0 && job.Status.Failed == 0 {
-			l.Info("Job hasn't started yet")
-			return ctrl.Result{RequeueAfter: 3 * time.Second}, nil
-		}
-
-		if job.Status.Active > 0 {
-			if job.Status.Failed > 0 {
-				l.Info("Job has failed")
-				return ctrl.Result{}, fmt.Errorf("Job has failed with error")
-			}
-
-			l.Info("Job is still running")
-			return ctrl.Result{RequeueAfter: 3 * time.Second}, nil
-		}
-
-		if job.Status.Succeeded > 0 {
-			l.Info("Job has succeeded")
-
-			err = r.Delete(ctx, &job, client.PropagationPolicy(metav1.DeletePropagationBackground))
-			if err != nil {
-				l.Error(err, "Unable to delete Job")
-			}
-			return ctrl.Result{}, nil
-		}
-
-		return ctrl.Result{}, fmt.Errorf("Job has failed with error")
 	}
+
+	l.Info("Job exists, check status", "Active", job.Status.Active, "Succeeded", job.Status.Succeeded, "Failed", job.Status.Failed, "Backofflimit", job.Spec.BackoffLimit)
+
+	if job.Status.Active == 0 && job.Status.Succeeded == 0 && job.Status.Failed == 0 {
+		l.Info("Job hasn't started yet")
+		return ctrl.Result{RequeueAfter: 3 * time.Second}, nil
+	}
+
+	if job.Status.Active > 0 {
+		if job.Status.Failed > 0 {
+			l.Info("Job has failed")
+			return ctrl.Result{}, fmt.Errorf("Job has failed with error")
+		}
+
+		l.Info("Job is still running")
+		return ctrl.Result{RequeueAfter: 3 * time.Second}, nil
+	}
+
+	if job.Status.Succeeded > 0 {
+		l.Info("Job has succeeded")
+
+		err := r.Delete(ctx, &job, client.PropagationPolicy(metav1.DeletePropagationBackground))
+		if err != nil {
+			l.Error(err, "Unable to delete Job")
+		}
+		return ctrl.Result{}, nil
+	}
+
+	return ctrl.Result{}, fmt.Errorf("Job has failed with error")
 }
 
 // SetupWithManager sets up the controller with the Manager.
