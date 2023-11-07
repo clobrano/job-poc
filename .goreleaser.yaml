@@ -10,6 +10,8 @@ builds:
       - linux
     goarch:
       - amd64
+    #hooks:
+      #post: ./community-release.sh {{ .ProjectName }} {{ .Tag }}
 
 release:
   draft: true
