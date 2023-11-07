@@ -31,7 +31,7 @@ release:
   skip_upload: true
 
 archives:
-  # Archives won't be uploaded, but we can't avoid them to be created.
+  # Archives won't be uploaded, but we can't avoid to created them.
   # Define the minimum and fastest process.
   - format: binary
 
