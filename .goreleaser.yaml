@@ -41,6 +41,8 @@ archives:
   - format: binary
 
 changelog:
+  # `github`: uses the compare GitHub API, appending the author login to the changelog.
+  use: github
   sort: asc
   filters:
     exclude:
