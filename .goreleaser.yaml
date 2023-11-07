@@ -18,7 +18,20 @@ builds:
       - CGO_ENABLED=0
     goos:
       - linux
+    goarch:
+      - x86_64
 
+release:
+  draft: true
+  replace_existing_draft: true
+  header: |
+    ## Some title ({{ .Date }})
+
+    Welcome to this new release!
+    ## Images
+    * Operator: quay.io/path/to/operator/image:v{{ .Tag }}
+  # Set this to true if you want to disable just the artifact upload to the SCM
+  skip_upload: true
 archives:
   - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of `uname`.
