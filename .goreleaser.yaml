@@ -3,13 +3,6 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
 
-before:
-  hooks:
-    # You may remove this if you don't use go modules.
-    - go mod tidy
-    # you may remove this if you don't need go generate
-    - go generate ./...
-
 builds:
   - env:
       - CGO_ENABLED=0
@@ -34,6 +27,7 @@ release:
 
   # Set this to true if you want to disable just the artifact upload to the SCM
   skip_upload: true
+
 archives:
   # Archives won't be uploaded, but we can't avoid them to be created.
   # Define the minimum and fastest process.
