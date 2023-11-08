@@ -17,15 +17,20 @@ release:
   draft: true
   replace_existing_draft: true
   header: |
-    ## {{ .ProjectName }} v{{ .Tag }}
-
-    ## Images
-    * Operator: quay.io/path/to/operator/image:v{{ .Tag }}
-    * Bundle: quay.io/path/to/operator/bundle/image:v{{ .Tag }}
-    * Catalog: quay.io/path/to/operator/catalog/image:v{{ .Tag }}
+    # {{ .ProjectName }} v{{ .Tag }}
 
     ## Notable changes
     <to be filled with items from changelog below>
+
+    ## Release Artifacts
+
+    ### Images
+    * Operator: quay.io/medik8s/{{ .ProjectName }}-operator:v{{ .Tag }}
+    * Bundle: quay.io/medik8s/{{ .ProjectName }}-operator-bundle:v{{ .Tag }}
+    * Catalog aka Index: quay.io/medik8s/{{ .ProjectName }}-operator-catalog:v{{ .Tag }}
+
+    ### Source code and OLM manifests
+    Please find the source code and the OLM manifests in the `Assets` section below.
 
   # Set this to true if you want to disable just the artifact upload to the SCM
   skip_upload: true
